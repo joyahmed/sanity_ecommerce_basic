@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+	.carousel {
+		@apply relative overflow-hidden;
+	}
+
+	.carousel-slider {
+		@apply relative flex items-center justify-center w-[80vw] h-[200px];
+	}
+
+	.carousel:hover {
+		animation-play-state: paused;
+	}
+}
+
+@layer utlities {
+	.pause {
+		aniamtion-play-state: paused;
+	}
+}
