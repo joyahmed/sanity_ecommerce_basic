@@ -1,8 +1,7 @@
 import {
-	AiOutlineLeft,
-	AioutlineMinus,
 	AiOutlineMinus,
 	AiOutlinePlus,
+	AiOutlineRight,
 	AiOutlineShopping,
 	TiDeleteOutline
 } from '@/constants';
@@ -15,9 +14,9 @@ import { urlFor } from '../lib/client';
 import getStripe from '../lib/getStripe';
 
 const Cart = () => {
-
 	const cartRef = useRef();
 	const {
+		mounted,
 		totalPrice,
 		totalQuantity,
 		cartItems,
@@ -27,7 +26,12 @@ const Cart = () => {
 		toggleCartItemQuantity
 	} = useApp();
 
+	const [animate, setAnimate] = useState(false);
 
+	const handleCloseCart = () => {
+		setAnimate(prev => !prev);
+		setTimeout(() => (setShowCart(prev => !prev),setAnimate(prev => !prev)), 150);
+	};
 
 	const handleCheckout = async () => {
 		const stripe = await getStripe();
@@ -51,7 +55,7 @@ const Cart = () => {
 		stripe.redirectToCheckout({ sessionId: data.id });
 	};
 
-	//if (!mounted) return null;
+	if (!mounted) return null;
 
 	return (
 		<div
@@ -67,16 +71,22 @@ const Cart = () => {
 			<div className='relative w-full sm:w-[600px] h-screen bg-white sm:float-right px-4 sm:px-[40px] py-10'>
 				<button
 					type='button'
-					className='flex items-center text-[18px] cursor-pointer gap-[2px] ml-[10px] border-0 bg-transparent text-sm font-bold'
-					onClick={() => setShowCart(prev => !prev)}
+					className='flex items-center w-full text-[18px] cursor-pointer gap-[2px] ml-[10px] border-0 bg-transparent text-sm font-bold px-5'
+					onClick={handleCloseCart}
 				>
-					<AiOutlineLeft />
 					<span className='ml-[10px]'>Your Cart</span>
 					<span className='ml-[10px] text-[#f02d34]'>
 						({totalQuantity} items)
 					</span>
+					<span
+						className={`${
+							animate ? 'translate-x-[30rem] scale-0 opacity-0  transition-all duration-500 ease-out' : 'scale-100 opacity-100 translate-x-0'
+						}`}
+					>
+						<AiOutlineRight />
+					</span>
 				</button>
-				{cartItems.length < 1 && (
+				{cartItems === null && (
 					<div className='flex flex-col m-[40px] items-center justify-center w-full'>
 						<AiOutlineShopping size={150} />
 						<h3 className='text-[20px] font-bold'>
@@ -93,17 +103,18 @@ const Cart = () => {
 						</Link>
 					</div>
 				)}
-				<div className='mt-[15px] sm:mt-[10px] px-[20px] py-[10px] min-h-screen  overflow-auto space-y-7'>
-					{cartItems.length >= 1 &&
+				<div className='mt-[15px] sm:mt-[10px] px-[20px] py-[10px] h-[calc(100vh_-_13rem)] overflow-y-auto space-y-7'>
+					{cartItems !== null &&
+						cartItems.length >= 1 &&
 						cartItems.map(item => (
 							<div
-								key={item._id}
+								key={item?._id}
 								className='flex items-start justify-between px-[20px] py-[5px] gap-5 h-[6rem]'
 							>
-								{item.image ? (
+								{item?.image ? (
 									<Image
 										src={`${urlFor(item.image[0])}`}
-										alt={item.name}
+										alt={item?.name}
 										width={100}
 										height={100}
 										className='bg-gray-200 rounded-lg'
@@ -111,8 +122,8 @@ const Cart = () => {
 								) : null}
 								<div className='flex flex-col font-bold justify-between w-full h-[6rem]'>
 									<div className='flex items-start justify-between w-full h-full'>
-										<h5>{item.name}</h5>
-										<h4>${item.price}</h4>
+										<h5>{item?.name}</h5>
+										<h4>${item?.price}</h4>
 									</div>
 									<div className='flex justify-between w-full h-full'>
 										<div>
@@ -129,7 +140,7 @@ const Cart = () => {
 													<AiOutlineMinus />
 												</span>
 												<span className='quantity'>
-													{item.quantity}
+													{item?.quantity}
 												</span>
 												<span
 													className='product-buttons'
@@ -147,7 +158,7 @@ const Cart = () => {
 										<button
 											type='button'
 											className=''
-											onClick={() => removeFromCart(item)}
+											onClick={() => removeFromCart(item._id)}
 										>
 											<TiDeleteOutline />
 										</button>

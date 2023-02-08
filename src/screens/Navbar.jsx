@@ -5,7 +5,8 @@ import { useApp } from '../context/AppContext';
 import { Cart } from './';
 
 const Navbar = () => {
-	const { setShowCart, totalQuantity } = useApp();
+	const { cartItems, setShowCart, totalQuantity, cartQuantity } =
+		useApp();
 	return (
 		<header className='relative flex flex-row justify-between w-full h-auto px-4 sm:px-16 mb-2.5 -mt-3'>
 			<Link href='/' className='font-bold text-[17px]'>
